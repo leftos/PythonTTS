@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PythonTTS\PythonTTS.csproj" />
+  </ItemGroup>
+  
+  <Target Name="LinkPython" AfterTargets="Build">
+    <Exec Command="rmdir $(OutputPath)python3.12.9" />
+    <Exec Command="mklink /D $(OutputPath)python3.12.9 $(ProjectDir)..\PythonTTS\python3.12.9" />
+  </Target>
+
+  <Target Name="CopyPythonScript" BeforeTargets="Build">
+    <Copy SourceFiles="..\PythonTTS\KokoroTTS.py" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

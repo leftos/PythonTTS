@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  
+  <Target Name="LinkPython" AfterTargets="Build">
+    <Exec Command="rmdir $(OutputPath)python3.12.9" />
+    <Exec Command="mklink /D $(OutputPath)python3.12.9 $(ProjectDir)python3.12.9" />
+  </Target>
+
+  <Target Name="CopyPythonScript" AfterTargets="Build">
+    <Copy SourceFiles="KokoroTTS.py" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <ItemGroup>
+    <None Remove="KokoroTTS.py" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="KokoroTTS.py" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pythonnet" Version="3.0.5" />
+  </ItemGroup>
+
+</Project>
