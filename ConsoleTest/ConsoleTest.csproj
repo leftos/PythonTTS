@@ -5,11 +5,8 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Platforms>x64</Platforms>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\PythonTTS\PythonTTS.csproj" />
-  </ItemGroup>
   
   <Target Name="LinkPython" AfterTargets="Build">
     <Exec Command="rmdir $(OutputPath)python3.12.9" />

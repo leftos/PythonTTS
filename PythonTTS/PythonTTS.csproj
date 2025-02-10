@@ -5,6 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
   
   <Target Name="LinkPython" AfterTargets="Build">
@@ -22,6 +25,10 @@
 
   <ItemGroup>
     <Content Include="KokoroTTS.py" />
+    <None Remove="KokoroTTS_Voices.json" />
+    <Content Include="KokoroTTS_Voices.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
