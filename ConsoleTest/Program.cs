@@ -1,24 +1,66 @@
-﻿using PythonTTS;
+﻿using System.Reflection;
+using System.Runtime.Loader;
+
+#nullable disable
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        var kokoro = new KokoroTTS(@"python3.12.9\python312.dll");
-        Task speakStartTask = kokoro.StartSpeechAsync("This is a very long text that will be spoken. And this is the second sentence. And this is the third sentence. And this is the fourth sentence. And this is the fifth sentence. And this is the sixth sentence. And this is the seventh sentence. And this is the eighth sentence. And this is the ninth sentence. And this is the tenth sentence.");
-        while (!speakStartTask.IsCompleted)
+        for (int i = 0; i < 3; i++)
         {
-            Console.Write($"\rWaiting on speech to start...");
-            Thread.Sleep(100);
+            var pluginLoadContext = new PluginLoadContext(@"C:\Users\Leftos\source\repos\PythonTTS\PythonTTS\bin\x64\Debug\net9.0\PythonTTS.dll");
+            var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName("PythonTTS"));
+            dynamic kokoro = Activator.CreateInstance(assembly.GetType("PythonTTS.KokoroTTS"), @"C:\Users\Leftos\source\repos\PythonTTS\PythonTTS\bin\x64\Debug\net9.0\python3.12.9\python312.dll");
+            Task speakStartTask = kokoro.StartSpeechAsync("This is a text-to-speech test.");
+            while (!speakStartTask.IsCompleted)
+            {
+                Console.Write($"\rWaiting on speech to start...");
+                Thread.Sleep(100);
+            }
+
+            Console.WriteLine();
+            int secondsElapsed = 0;
+            while (kokoro.IsSpeaking())
+            {
+                Thread.Sleep(1000);
+                secondsElapsed++;
+                Console.Write($"\rSpeaking for {secondsElapsed} seconds...");
+            }
+
+            Console.WriteLine();
         }
-        Console.WriteLine();
-        int secondsElapsed = 0;
-        while (kokoro.IsSpeaking())
+    }
+
+    class PluginLoadContext : AssemblyLoadContext
+    {
+        private AssemblyDependencyResolver _resolver;
+
+        public PluginLoadContext(string pluginPath) : base(true)
         {
-            Thread.Sleep(1000);
-            secondsElapsed++;
-            Console.Write($"\rSpeaking for {secondsElapsed} seconds...");
+            _resolver = new AssemblyDependencyResolver(pluginPath);
         }
-        Console.WriteLine();
+
+        protected override Assembly Load(AssemblyName assemblyName)
+        {
+            string assemblyPath = _resolver.ResolveAssemblyToPath(assemblyName);
+            if (assemblyPath != null)
+            {
+                return LoadFromAssemblyPath(assemblyPath);
+            }
+
+            return null;
+        }
+
+        protected override IntPtr LoadUnmanagedDll(string unmanagedDllName)
+        {
+            string libraryPath = _resolver.ResolveUnmanagedDllToPath(unmanagedDllName);
+            if (libraryPath != null)
+            {
+                return LoadUnmanagedDllFromPath(libraryPath);
+            }
+
+            return IntPtr.Zero;
+        }
     }
 }
