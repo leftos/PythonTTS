@@ -13,6 +13,9 @@ def set_voice(_voice):
     global voice
     voice = _voice
     
+def get_voice():
+    return voice
+    
 def set_speed(_speed):
     global speed
     speed = _speed

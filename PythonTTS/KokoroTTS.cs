@@ -1,10 +1,14 @@
-﻿using Python.Runtime;
+﻿using System.Diagnostics.CodeAnalysis;
+using Python.Runtime;
+
+// ReSharper disable UnusedMember.Global
 
 namespace PythonTTS
 {
+    [SuppressMessage("Performance", "CA1822:Mark members as static")]
     public class KokoroTTS
     {
-        private readonly dynamic tts;
+        private readonly dynamic _tts;
 
         public KokoroTTS(string pythonDLL)
         {
@@ -20,13 +24,15 @@ namespace PythonTTS
                 string codeToRedirectOutput =
                     "import sys\n" +
                     "from io import StringIO\n" +
+                    // ReSharper disable once StringLiteralTypo
                     "sys.stdout = mystdout = StringIO()\n" +
                     "sys.stdout.flush()\n" +
+                    // ReSharper disable once StringLiteralTypo
                     "sys.stderr = mystderr = StringIO()\n" +
                     "sys.stderr.flush()\n";
                 PythonEngine.Exec(codeToRedirectOutput);
 
-                tts = Py.Import(@"KokoroTTS");
+                _tts = Py.Import(@"KokoroTTS");
             }
         }
 
@@ -36,7 +42,7 @@ namespace PythonTTS
             {
                 using (Py.GIL())
                 {
-                    tts.tts(text);
+                    _tts.tts(text);
                 }
             });
         }
@@ -45,7 +51,7 @@ namespace PythonTTS
         {
             using (Py.GIL())
             {
-                tts.stop(); 
+                _tts.stop(); 
             }
         }
 
@@ -53,8 +59,28 @@ namespace PythonTTS
         {
             using (Py.GIL())
             {
-                return tts.is_speaking();
+                return _tts.is_speaking();
             }
         }
+
+        public void SetVoice(string voiceId)
+        {
+            ArgumentNullException.ThrowIfNull(voiceId);
+
+            using (Py.GIL())
+            {
+                _tts.set_voice(voiceId);
+            }
+        }
+        
+        public string GetVoice()
+        {
+            using (Py.GIL())
+            {
+                return _tts.get_voice();
+            }
+        }
+
+        public string GetVoicesJson(string pythonTTSDir) => File.ReadAllText(Path.Combine(pythonTTSDir, @"KokoroTTS_Voices.json"));
     }
 }
