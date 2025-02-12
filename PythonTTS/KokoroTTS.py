@@ -21,10 +21,16 @@ def set_speed(_speed):
     speed = _speed
     
 def tts(text):
-    generator = pipeline(text, voice=voice, speed=speed, split_pattern=r'\n+')
+    generator = pipeline(text, voice=voice, speed=speed, split_pattern=None)
     
-    for (_, _, audio) in generator:
-        sd.play(audio, 24000)
+    (_, _, audio) = next(generator)
+    
+    with sf.SoundFile(io.BytesIO(), samplerate=24000, channels=1, mode='w+', format='WAV') as tempfile:
+        tempfile.write(audio)
+        duration = tempfile.frames / (tempfile.samplerate * tempfile.channels)
+        
+    sd.play(audio, 24000)
+    return duration
 
 def stop():
     sd.stop()

@@ -36,13 +36,14 @@ namespace PythonTTS
             }
         }
 
-        public Task StartSpeechAsync(string text)
+        public Task<TimeSpan> StartSpeechAsync(string text)
         {
             return Task.Run(() =>
             {
                 using (Py.GIL())
                 {
-                    _tts.tts(text);
+                    dynamic duration = _tts.tts(text);
+                    return TimeSpan.FromSeconds((double)duration);
                 }
             });
         }

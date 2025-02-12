@@ -12,13 +12,15 @@ internal class Program
             var pluginLoadContext = new PluginLoadContext(@"C:\Users\Leftos\source\repos\PythonTTS\PythonTTS\bin\x64\Debug\net9.0\PythonTTS.dll");
             var assembly = pluginLoadContext.LoadFromAssemblyName(new AssemblyName("PythonTTS"));
             dynamic kokoro = Activator.CreateInstance(assembly.GetType("PythonTTS.KokoroTTS"), @"C:\Users\Leftos\source\repos\PythonTTS\PythonTTS\bin\x64\Debug\net9.0\python3.12.9\python312.dll");
-            Task speakStartTask = kokoro.StartSpeechAsync("This is a text-to-speech test.");
+            Task<TimeSpan> speakStartTask = kokoro.StartSpeechAsync("This is a text-to-speech test.");
             while (!speakStartTask.IsCompleted)
             {
                 Console.Write($"\rWaiting on speech to start...");
                 Thread.Sleep(100);
             }
 
+            Console.WriteLine();
+            Console.WriteLine($"Generated speech duration: {speakStartTask.Result}");
             Console.WriteLine();
             int secondsElapsed = 0;
             while (kokoro.IsSpeaking())
